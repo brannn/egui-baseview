@@ -602,7 +602,26 @@ where
             },
         }
 
-        EventStatus::Captured
+        // Only capture events that egui actually wants to handle.
+        // This allows keyboard shortcuts (like spacebar for transport) to pass through
+        // to the DAW host when egui doesn't need keyboard input (e.g., no text field focused).
+        match &event {
+            baseview::Event::Keyboard(_) => {
+                if self.egui_ctx.wants_keyboard_input() {
+                    EventStatus::Captured
+                } else {
+                    EventStatus::Ignored
+                }
+            }
+            baseview::Event::Mouse(_) => {
+                if self.egui_ctx.is_using_pointer() || self.egui_ctx.wants_pointer_input() {
+                    EventStatus::Captured
+                } else {
+                    EventStatus::Ignored
+                }
+            }
+            baseview::Event::Window(_) => EventStatus::Captured,
+        }
     }
 }
 
