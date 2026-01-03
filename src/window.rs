@@ -614,11 +614,9 @@ where
                 }
             }
             baseview::Event::Mouse(_) => {
-                if self.egui_ctx.is_using_pointer() || self.egui_ctx.wants_pointer_input() {
-                    EventStatus::Captured
-                } else {
-                    EventStatus::Ignored
-                }
+                // Always capture mouse events in embedded window contexts (plugins).
+                // This prevents hover events from passing through to the host application.
+                EventStatus::Captured
             }
             baseview::Event::Window(_) => EventStatus::Captured,
         }
